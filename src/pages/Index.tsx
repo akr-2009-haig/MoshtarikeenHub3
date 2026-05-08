@@ -35,12 +35,13 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { LegacySystemLayout } from '../legacy-system/LegacySystemLayout';
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
-interface Subscriber {
+export interface Subscriber {
   id: string;
   name: string;
   phone: string;
@@ -58,7 +59,7 @@ interface Subscriber {
   platform: string;
 }
 
-interface Operation {
+export interface Operation {
   id: string;
   subscriberName: string;
   operation: string;
@@ -67,14 +68,14 @@ interface Operation {
   status: string;
 }
 
-interface Stats {
+export interface Stats {
   totalSubscribers: string;
   totalProfits: string;
   activeSubscriptions: string;
   pendingRequests: string;
 }
 
-interface SystemConfig {
+export interface SystemConfig {
   sectionNames: {
     dashboard: string;
     admin: string;
@@ -579,7 +580,7 @@ const EMPTY_OP: Omit<Operation, 'id'> = {
 // Root
 // ─────────────────────────────────────────────────────────────
 
-type Tab = 'dashboard' | 'admin' | 'addOperations' | 'addSubscriber' | 'systemAdmin' | 'advanced';
+export type Tab = 'dashboard' | 'admin' | 'addOperations' | 'addSubscriber' | 'systemAdmin' | 'advanced';
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -864,15 +865,16 @@ export default function Index() {
             </motion.div>
           )}
           {activeTab === 'advanced' && (
-            <motion.div key="advanced" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="w-full">
-              <AdvancedSystemTab
+            <motion.div key="advanced" initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="w-full flex-1 flex flex-col">
+              <LegacySystemLayout
                 subscribers={subscribers}
                 operations={operations}
-                stats={liveStats}
                 systemConfig={systemConfig}
                 onOperationsChange={setOperations}
                 onSubscribersChange={setSubscribers}
+                onConfigChange={updateConfig}
+                onExit={() => setActiveTab('dashboard')}
               />
             </motion.div>
           )}
@@ -886,13 +888,13 @@ export default function Index() {
 // Dashboard Tab — النظام الإداري
 // ─────────────────────────────────────────────────────────────
 
-interface LiveStats {
+export interface LiveStats {
   totalSubscribers: string; totalProfits: string; activeSubscriptions: string;
   pendingRequests: string; activeCount: string; completedOpsStr: string;
   totalSubsCount: string; activationOpsStr: string;
 }
 
-function DashboardTab({ stats, subscribers, operations, institutionalText, sectionName }: {
+export function DashboardTab({ stats, subscribers, operations, institutionalText, sectionName }: {
   stats: LiveStats;
   subscribers: Subscriber[];
   operations: Operation[];
@@ -1129,7 +1131,7 @@ function DashboardTab({ stats, subscribers, operations, institutionalText, secti
 // System Admin Tab — لوحة إدارة النظام
 // ─────────────────────────────────────────────────────────────
 
-function SystemAdminTab({ systemConfig, onConfigChange, subscribersCount, sectionName }: {
+export function SystemAdminTab({ systemConfig, onConfigChange, subscribersCount, sectionName }: {
   systemConfig: SystemConfig;
   onConfigChange: (partial: Partial<SystemConfig>) => void;
   subscribersCount: number;
@@ -1379,7 +1381,7 @@ function SystemAdminTab({ systemConfig, onConfigChange, subscribersCount, sectio
 
 const OPS_PER_PAGE = 8;
 
-function AdminPanel({ subscribers, operations, sectionName }: {
+export function AdminPanel({ subscribers, operations, sectionName }: {
   subscribers: Subscriber[];
   operations: Operation[];
   sectionName: string;
@@ -1835,7 +1837,7 @@ function FinBox({ icon, label, value, bg, ring, color, extra }: {
 
 const ADMIN_OPS_PER_PAGE = 12;
 
-function AddOperationsTab({ operations, onOperationsChange, subscriberNames, sectionName }: {
+export function AddOperationsTab({ operations, onOperationsChange, subscriberNames, sectionName }: {
   operations: Operation[];
   onOperationsChange: (o: Operation[]) => void;
   subscriberNames: string[];
@@ -2054,7 +2056,7 @@ function AddOperationsTab({ operations, onOperationsChange, subscriberNames, sec
 
 const SUBS_PER_PAGE = 10;
 
-function AddSubscriberTab({ subscribers, onSubscribersChange, sectionName }: {
+export function AddSubscriberTab({ subscribers, onSubscribersChange, sectionName }: {
   subscribers: Subscriber[];
   onSubscribersChange: (s: Subscriber[]) => void;
   sectionName: string;
